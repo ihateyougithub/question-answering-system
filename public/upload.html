@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>上传头像</title>
+</head>
+<body>
+    <!-- 
+    上传头像必须使用post方法
+    get请求内容大小不能超过1KB 
+    enctype="multipart/form-data" 默认text/html 
+    对上传文件进行编码 转换成二进制进行上传-->
+    <form action="/upload" method="post"
+     enctype="multipart/form-data">
+       <!-- file 类型为选择文件类型
+       accept 接受的文件类型
+       required 必填 -->
+      <input type="file" accept="image/jpeg,image/jpg,image/png"
+       name="photo" required>
+       <input type="submit" value="上传头像">
+    </form>
+</body>
+</html>

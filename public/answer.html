@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <title>回答</title>
+    <style>
+        textarea{
+            resize: none;
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="navbar navbar-inverse">
+        <div class="container">
+            <div class="navbar-header">
+                <div class="navbar-brand">
+                    智游问答系统
+                </div>
+            </div>
+            
+        </div>
+    </nav>
+
+    <div class="container">
+        <form action="">
+            <div class="form-group">
+                <label for="">账号</label>
+                <textarea name="content" 
+                class="form-control"></textarea>
+            </div>
+            
+        </form>
+        <br>
+        <div class="btn btn-primary form-control">提交答案</div>
+    </div>
+    <script src="js/jquery.min.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+    <script>
+        $('.btn').click(function(){
+
+            $.post('/answer',$('form').serialize(),
+            function(data){
+                console.log(data);
+                if(data.status == 200)
+                {
+                    location.href = 'index.html'
+                }
+                else 
+                {
+                    alert(data.message);
+                }
+            })
+        })
+    </script>
+</body>
+
+</html>

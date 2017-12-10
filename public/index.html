@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <title>问答系统首页</title>
+    <style>
+        .header {
+            width: 50px;
+
+            height: 50px;
+
+            border-radius: 50%;
+        }
+
+        ul {
+            list-style: none;
+        }
+
+        .answerBtn {
+            float: right;
+        }
+
+        h6 {
+            text-align: right;
+
+            margin: 0px;
+        }
+
+        li {
+            padding: 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="navbar navbar-inverse">
+        <div class="container">
+            <div class="navbar-header">
+                <div class="navbar-brand">
+                    智游问答系统
+                </div>
+            </div>
+            <div>
+                <ul id="menu" class="nav navbar-nav navbar-right">
+                    <li id="ask">
+                        <a href="">
+                            <span class="glyphicon glyphicon-question-sign">
+                            </span> 提问
+                        </a>
+                    </li>
+                    <li id="dropMenu">
+                        <a href="login.html">
+                            <span class="glyphicon glyphicon-plus"></span> 登陆
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container">
+
+    </main>
+    <script src="js/jquery.min.js"></script>
+    <script src="js/jquery.cookie.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+    <script src="template.js"></script>
+    <script id="question-answer" type="text/html">
+        <ul class="list-group">
+            {{each questions as question index}}
+            <li>
+                <div class="panel panel-primary">
+                    <div class="panel-heading">
+                        <h3 class="panel-title"><img class="header" src="{{question.header}}">{{question.name}} 提问时间：{{question.time}}</h3>
+                    </div>
+                    <div class="panel-body">{{question.content}}<br><button class="answerBtn" index="{{index}}">我来回答</button></div>
+                    <ul class="list-group">
+                        {{if question.answers}} 
+                        {{each question.answers as ans i}}
+                        <li class="list-group-item-success">
+                            <p>{{ans.content}}</p>
+                            <h6>回答人:{{ans.name}} 回答时间:{{ans.time}}<img src="{{ans.header}}" class="header"></h6>
+                        </li>
+                        {{/each}} 
+                        {{/if}}
+                    </ul>
+                </div>
+            </li>
+            {{/each}}
+        </ul>
+    </script>
+    <script>
+        var cookieName = $.cookie('userName');
+
+        if (cookieName) {
+            // $('ul li:last-child a').text('')
+
+            // 增加下拉菜单
+            var html = '';
+            html += '<a type="button" class="btn dropdown-toggle" id="dropdownMenu1" data-toggle="dropdown">' + cookieName + '<span class="caret"></span></a>'
+            html += '<ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu1">'
+            html += ' <li role="presentation"><a role="menuitem" tabindex="-1" href="upload.html">上传头像</a></li>'
+            html += '<li id="loginOut" role="presentation"><a role="menuitem" tabindex="-1" href="#">退出登陆</a></li></ul>'
+            $('#dropMenu').addClass('dropdown');
+            $('#dropMenu').html(html)
+
+            // 获取登陆用户的头像
+            $.get('/myHeader', function (data) {
+
+                console.log(data)
+                var img = '<li><img src="' + data + '" class="header" /></li>'
+
+                $('#menu').append(img)
+            })
+        }
+        else {
+            $('ul li:last-child a').text('登陆')
+        }
+
+        $('#ask').click(function (e) {
+            // 阻止默认事件
+            e.preventDefault();
+
+            if (cookieName) {
+                location.href = 'question.html'
+            }
+            else {
+                location.href = 'login.html'
+            }
+        })
+        $('#loginOut').click(function (e) {
+            e.preventDefault();
+            // 移除掉cookie
+            $.removeCookie('userName');
+
+            location.href = '/';
+
+        })
+
+        // 获取所有问题
+        $.get('/getAllQuestions', function (res) {
+            console.log(res)
+
+            var res = {
+                questions: res
+            }
+
+            var html = template('question-answer', res);
+
+            document.querySelector('main').innerHTML = html;
+            // var htmlStr = '';
+
+            // htmlStr += '<ul class="list-group">'
+
+            // for (var index = 0; index < res.length; index++) {
+            //     var user = res[index];
+            //     var time = new Date(user.time);
+            //     htmlStr += '<li>'
+            //     htmlStr += '<div class="panel panel-primary">'
+            //     htmlStr += '<div class="panel-heading">'
+            //     htmlStr += '<h3 class="panel-title"><img class="header" src="' + user.header + '"> ' + user.name + ' 提问时间:' + time.getFullYear() + '-' + (time.getMonth() + 1) + '-' + time.getDate() + '</h3>'
+            //     htmlStr += '</div><div class="panel-body">' + user.content + '<br>';
+            //     htmlStr += '<button class="answerBtn" index="' + index + '">我来回答</button>'
+            //     htmlStr += '</div>'
+            //     htmlStr += '<ul class="list-group">'
+
+            //     if (user.answers) {
+            //         for (var i = 0; i < user.answers.length; i++) {
+            //             var ans = user.answers[i];
+
+
+            //             htmlStr += '<li class="list-group-item-success">'
+            //             htmlStr += '<p>' + ans.content + '</p>'
+            //             var time = new Date(ans.time)
+            //             htmlStr += '<h6>回答人:' + ans.name + ' 回答时间:' +
+            //                 time.getFullYear() + '-' + (time.getMonth() + 1)
+            //                 + '-' + time.getDate() + '<img src="' +
+            //                 ans.header + '" class="header" ></h6>'
+            //             htmlStr += '</li>'
+            //         }
+            //     }
+            //     htmlStr += '</ul></div></li>'
+            // }
+
+            // htmlStr += '</ul>'
+
+            // $('main').html(htmlStr);
+
+            $('.answerBtn').click(function () {
+                // $(this) 现在正在被响应的标签
+                var index = $(this).attr('index');
+
+                console.log(index);
+
+                if ($.cookie('userName')) {
+                    $.cookie('index', index);
+
+                    location.href = 'answer.html'
+                }
+                else {
+                    location.href = 'login.html'
+                }
+            })
+        })
+    </script>
+</body>
+
+</html>
